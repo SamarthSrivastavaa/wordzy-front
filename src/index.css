@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+ 
+  .edu-nsw-act-cursive {
+    font-family: 'Edu NSW ACT Cursive', cursive;
+  }
+}
