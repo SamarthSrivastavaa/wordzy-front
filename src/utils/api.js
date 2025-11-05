@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+import { PRODUCTION_API_URL } from '../../config.production.js';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? PRODUCTION_API_URL : 'http://localhost:8000/api');
 
 // Helper function to get auth token from localStorage
 const getToken = () => {

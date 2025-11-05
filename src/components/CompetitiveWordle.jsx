@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { io } from 'socket.io-client'
 import { useAuth } from '../context/AuthContext'
 import api from '../utils/api'
+import { PRODUCTION_SOCKET_URL } from '../../config.production.js'
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:8000'
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || (import.meta.env.PROD ? PRODUCTION_SOCKET_URL : 'http://localhost:8000')
 
 const CompetitiveWordle = ({ roomId, isOwner, onLeave }) => {
   const { user } = useAuth()
