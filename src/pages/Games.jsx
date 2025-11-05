@@ -1,25 +1,40 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import Wordle from '../components/Wordle'
+import React, { useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import CompetitiveWordle from '../components/CompetitiveWordle'
+import { useAuth } from '../context/AuthContext'
 
 const Games = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const roomId = searchParams.get('roomId')
+  const isOwner = searchParams.get('isOwner') === 'true'
 
-  const handleBackToHero = () => {
-    navigate('/')
+  useEffect(() => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    if (!roomId) {
+      navigate('/home')
+    }
+  }, [user, roomId, navigate])
+
+  const handleLeave = () => {
+    navigate('/home')
+  }
+
+  if (!roomId) {
+    return null
   }
 
   return (
-    <div 
-      className="relative min-h-screen w-screen bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: "url('/bg2.png')",
-        backgroundPosition: 'center',
-        backgroundSize: 'cover'
-      }}
-    >
- <Wordle />
-    </div>
+    <CompetitiveWordle 
+      roomId={roomId} 
+      isOwner={isOwner}
+      onLeave={handleLeave}
+    />
   )
 }
 

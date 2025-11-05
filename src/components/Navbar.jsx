@@ -16,14 +16,15 @@ const Navbar = () => {
      </div>
 
 
-     <div className="flex items-center gap-3">
+     <div className="flex items-center gap-2 sm:gap-3">
        <button
-         className="w-[160px] rounded-md border-2 border-purple-600 bg-purple-600 text-white px-4 py-1.5 text-sm font-semibold hover:bg-transparent hover:text-purple-600 transition-colors relative"
+         className="w-full sm:w-[160px] rounded-md border-2 border-purple-600 bg-purple-600 text-white px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold hover:bg-transparent hover:text-purple-600 transition-colors relative whitespace-nowrap"
          style={{
            boxShadow: '2px 2px 0px rgba(147, 51, 234, 0.3)'
          }}
        >
-         Report a Bug
+         <span className="hidden sm:inline">Report a Bug</span>
+         <span className="sm:hidden">Bug</span>
        </button>
      </div>
    </div>

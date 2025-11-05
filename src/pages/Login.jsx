@@ -2,13 +2,18 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { useAuth } from '../context/AuthContext'
+import api from '../utils/api'
 
 const Login = () => {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -16,13 +21,23 @@ const Login = () => {
       ...prev,
       [name]: value
     }))
+    setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log('Login data:', formData)
-    navigate('/home')
+    setError('')
+    setLoading(true)
+
+    try {
+      const response = await api.login(formData.username, formData.password)
+      login(response)
+      navigate('/home')
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleBackToHero = () => {
@@ -47,20 +62,26 @@ const Login = () => {
 
       <Navbar />
       
-      <div className="flex-1 flex items-center justify-center px-6 py-8">
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
           
           {/* Left Side - Login Form */}
-          <div className="flex flex-col items-center justify-center">
-            <div className="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border-2 border-pink-300">
-              <h1 className="text-4xl font-bold text-gray-900 text-center mb-2">
+          <div className="flex flex-col items-center justify-center w-full">
+            <div className="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-2xl border-2 border-pink-300">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-2">
                 Welcome Back!
               </h1>
-              <p className="text-lg text-purple-600 text-center mb-8 font-semibold">
+              <p className="text-base sm:text-lg text-purple-600 text-center mb-6 sm:mb-8 font-semibold">
                 Ready to <span className="text-yellow-500">CREATE</span>, <span className="text-red-500">JOIN</span> & <span className="text-green-500">COMPETE</span>?
               </p>
               
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="bg-red-100 border-2 border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm font-semibold">
+                    {error}
+                  </div>
+                )}
+                
                 <div>
                   <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
                     Username
@@ -72,7 +93,8 @@ const Login = () => {
                     value={formData.username}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors duration-200 text-gray-900 font-medium"
+                    disabled={loading}
+                    className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors duration-200 text-gray-900 font-medium disabled:opacity-50"
                     placeholder="Enter your username"
                   />
                 </div>
@@ -88,16 +110,18 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors duration-200 text-gray-900 font-medium"
+                    disabled={loading}
+                    className="w-full px-4 py-3 border-2 border-pink-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors duration-200 text-gray-900 font-medium disabled:opacity-50"
                     placeholder="Enter your password"
                   />
                 </div>
                 
                 <button
                   type="submit"
-                  className="w-full px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-[2px_2px_0px_rgba(1,1,1,1)] hover:shadow-[3px_3px_0px_rgba(1,1,1,1)] transition-all duration-200 transform hover:-translate-y-1"
+                  disabled={loading}
+                  className="w-full px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-[2px_2px_0px_rgba(1,1,1,1)] hover:shadow-[3px_3px_0px_rgba(1,1,1,1)] transition-all duration-200 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Log In
+                  {loading ? 'Logging in...' : 'Log In'}
                 </button>
               </form>
               
@@ -115,14 +139,14 @@ const Login = () => {
             </div>
           </div>
           
-          {/* Right Side - Empty space for GIF/Video */}
-          <div className="flex items-center justify-center">
-            <div className="w-full h-96 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-pink-300 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">🎮</div>
-                <p className="text-2xl font-bold text-purple-600 mb-2">Coming Soon!</p>
-                <p className="text-gray-700 font-semibold">Interactive content will be here</p>
-              </div>
+          {/* Right Side - Word Game GIF */}
+          <div className="flex items-center justify-center w-full hidden lg:flex">
+            <div className="w-full h-96 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-pink-300 flex items-center justify-center p-4">
+              <img 
+                src="/Word Game GIF by Unpopular Cartoonist.gif" 
+                alt="Word Game Animation" 
+                className="w-full h-full object-contain rounded-lg"
+              />
             </div>
           </div>
         </div>
